@@ -1,8 +1,8 @@
-import { mongooseAdapter } from '@payloadcms/db-mongodb'
+import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { buildConfig } from 'payload'
-import { myPluginProducts } from 'my-plugin-products'
+import { feedsCollection } from '../src/index.js'
 import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 
@@ -37,16 +37,20 @@ export default buildConfig({
       },
     },
   ],
-  db: mongooseAdapter({
-    url: process.env.DATABASE_URI || '',
+
+  db: postgresAdapter({
+    pool: {
+      connectionString: process.env.DATABASE_URI || '',
+    },
   }),
+
   editor: lexicalEditor(),
   email: testEmailAdapter,
   onInit: async (payload) => {
     await seed(payload)
   },
   plugins: [
-    myPluginProducts({
+    feedsCollection({
       collections: {
         posts: true,
       },
